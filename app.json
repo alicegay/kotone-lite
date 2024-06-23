@@ -24,12 +24,19 @@
       [
         "expo-build-properties",
         {
-          "ios": {
-            "newArchEnabled": true
-          },
           "android": {
             "newArchEnabled": true
           }
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./src/assets/fonts/NunitoRoundedMplus-Regular.ttf",
+            "./src/assets/fonts/NunitoRoundedMplus-Medium.ttf",
+            "./src/assets/fonts/NunitoRoundedMplus-Bold.ttf"
+          ]
         }
       ]
     ]
