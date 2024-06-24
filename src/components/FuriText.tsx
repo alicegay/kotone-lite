@@ -53,7 +53,7 @@ const FuriText = ({ furigana }: Props) => {
     }
     for (let i = 0; i < furigana.pronunciation.length; i++) {
       const size = await textSize.measure({
-        text: furigana.surface[i],
+        text: furigana.pronunciation[i],
         fontFamily: '500',
         fontSize: 16,
         usePreciseWidth: true,
