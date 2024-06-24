@@ -88,6 +88,7 @@ const Button = forwardRef<View, Props>(
         {icon && (
           <Icon
             // @ts-ignore
+            name={icon}
             style={[
               styles.icon,
               focus && styles.iconFocus,
