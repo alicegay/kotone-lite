@@ -1,0 +1,17 @@
+diff --git a/android/build.gradle b/android/build.gradle
+index 7ec958b9cf32bf6d5e3ce01ee9bd69359ce008b1..04b6dc70af18cf285dd044f0d3f12da07e70fb42 100644
+--- a/android/build.gradle
++++ b/android/build.gradle
+@@ -19,10 +19,10 @@ def safeExtGet(prop, fallback) {
+ }
+ 
+ android {
+-    compileSdkVersion safeExtGet('JapaneseTextAnalyzer_compileSdkVersion', 29)
++    compileSdkVersion safeExtGet('JapaneseTextAnalyzer_compileSdkVersion', 30)
+     defaultConfig {
+         minSdkVersion safeExtGet('JapaneseTextAnalyzer_minSdkVersion', 16)
+-        targetSdkVersion safeExtGet('JapaneseTextAnalyzer_targetSdkVersion', 29)
++        targetSdkVersion safeExtGet('JapaneseTextAnalyzer_targetSdkVersion', 30)
+         versionCode 1
+         versionName "1.0"
+ 

@@ -1,13 +1,19 @@
 import { ReactNode } from 'react'
-import { Text as TextRN, StyleProp, TextStyle } from 'react-native'
+import {
+  Text as TextRN,
+  StyleProp,
+  TextStyle,
+  LayoutChangeEvent,
+} from 'react-native'
 
 interface Props {
   children: ReactNode
   numberOfLines?: number
   style?: StyleProp<TextStyle>
+  onLayout?: (event: LayoutChangeEvent) => void
 }
 
-const Text = ({ children, numberOfLines = 1, style }: Props) => {
+const Text = ({ children, numberOfLines = 1, style, onLayout }: Props) => {
   return (
     <TextRN
       numberOfLines={numberOfLines}
@@ -19,6 +25,7 @@ const Text = ({ children, numberOfLines = 1, style }: Props) => {
         },
         style,
       ]}
+      onLayout={onLayout}
     >
       {children}
     </TextRN>

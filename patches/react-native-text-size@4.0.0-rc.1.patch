@@ -1,0 +1,19 @@
+diff --git a/android/build.gradle b/android/build.gradle
+index 2617bd7efd14849522ca1daa059e31984c9c752d..f20fb1ec6864368025be8ce5b2f343c88f0ad1da 100644
+--- a/android/build.gradle
++++ b/android/build.gradle
+@@ -8,10 +8,10 @@ def safeExtGet(prop, fallback) {
+     return rootProject.ext.hasProperty(prop) ? rootProject.ext.get(prop) : fallback
+ }
+ 
+-def _buildToolsVersion  = safeExtGet('buildToolsVersion', '28.0.3')
+-def _compileSdkVersion  = safeExtGet('compileSdkVersion', 28)
+-def _targetSdkVersion   = safeExtGet('targetSdkVersion', 28)
+-def _minSdkVersion      = safeExtGet('minSdkVersion', 16)
++def _buildToolsVersion  = safeExtGet('buildToolsVersion', '34.0.0')
++def _compileSdkVersion  = safeExtGet('compileSdkVersion', 30)
++def _targetSdkVersion   = safeExtGet('targetSdkVersion', 30)
++def _minSdkVersion      = safeExtGet('minSdkVersion', 23)
+ 
+ buildscript {
+     repositories {

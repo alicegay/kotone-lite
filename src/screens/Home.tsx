@@ -16,6 +16,9 @@ import ticksToTime from 'lib/ticksToTime'
 import Text from 'components/Text'
 import IconButton from 'components/IconButton'
 import { sessions } from 'jellyfin-api'
+import { analyse } from 'lib/analyse'
+import Furigana from 'types/Furigana'
+import FuriText from 'components/FuriText'
 
 const Home = () => {
   useKeepAwake()
@@ -28,6 +31,8 @@ const Home = () => {
   const [track, setTrack] = useState<Item>()
   const [image, setImage] = useState<string>()
   const [color, setColor] = useState<string>('#222')
+  const [furigana, setFurigana] = useState<Furigana>()
+  const [lastTrack, setLastTrack] = useState<string>()
 
   useEffect(() => {
     if (!!session.data && !!session.data.NowPlayingItem) {
@@ -37,30 +42,41 @@ const Home = () => {
 
   useEffect(() => {
     if (!!track) {
-      setImage(client.server + '/Items/' + track.Id + '/Images/Primary')
-      if ('Primary' in track.ImageTags || track.AlbumPrimaryImageTag) {
-        const average = getBlurHashAverageColor(
-          track.ImageBlurHashes.Primary[
-            'Primary' in track.ImageTags
-              ? track.ImageTags.Primary
-              : track.AlbumPrimaryImageTag
-          ]
-        )
-        const tcolor = tinycolor({
-          r: average[0],
-          g: average[1],
-          b: average[2],
-        })
-        if (tcolor.isLight()) {
-          setColor(tcolor.darken(30).toHex8String())
+      if (lastTrack != track.Id) {
+        setLastTrack(track.Id)
+        setImage(client.server + '/Items/' + track.Id + '/Images/Primary')
+        if ('Primary' in track.ImageTags || track.AlbumPrimaryImageTag) {
+          const average = getBlurHashAverageColor(
+            track.ImageBlurHashes.Primary[
+              'Primary' in track.ImageTags
+                ? track.ImageTags.Primary
+                : track.AlbumPrimaryImageTag
+            ]
+          )
+          const tcolor = tinycolor({
+            r: average[0],
+            g: average[1],
+            b: average[2],
+          })
+          if (tcolor.isLight()) {
+            setColor(tcolor.darken(30).toHex8String())
+          } else {
+            setColor(tcolor.toHex8String())
+          }
         } else {
-          setColor(tcolor.toHex8String())
+          setColor('#222')
         }
-      } else {
-        setColor('#222')
+        analyse(track.Name).then((result) => setFurigana(result))
       }
     }
   }, [track])
+
+  useEffect(() => {
+    if (furigana) {
+      console.log('SURFACE        ' + furigana.surface.join(' '))
+      console.log('PRONUNCIATION  ' + furigana.pronunciation.join(' '))
+    }
+  }, [furigana])
 
   // const socket = new WebSocket(
   //   client.server.replace('https://', 'wss://').replace('http://', 'wss://') +
@@ -147,12 +163,13 @@ const Home = () => {
                   gap: 4,
                 }}
               >
-                <Text
+                {!!furigana && <FuriText furigana={furigana} />}
+                {/* <Text
                   style={{ fontFamily: '700', fontSize: 48 }}
                   numberOfLines={2}
                 >
                   {track.Name}
-                </Text>
+                </Text> */}
                 {!!track.Artists && (
                   <Text style={{ fontFamily: '500', fontSize: 24 }}>
                     {track.Artists.join(', ')}
