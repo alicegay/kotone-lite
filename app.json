@@ -11,14 +11,6 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "androidStatusBar": {
-      "barStyle": "dark-content",
-      "translucent": true
-    },
-    "androidNavigationBar": {
-      "barStyle": "dark-content",
-      "visible": "immersive"
-    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
@@ -47,7 +39,8 @@
             "./src/assets/fonts/NunitoRoundedMplus-Bold.ttf"
           ]
         }
-      ]
+      ],
+      "./src/plugins/androidDisplayCutout.js"
     ],
     "extra": {
       "eas": {
