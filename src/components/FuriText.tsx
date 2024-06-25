@@ -68,7 +68,7 @@ const FuriText = ({ furigana }: Props) => {
 
   return (
     <View style={{ flexDirection: 'row' }}>
-      <Text style={styles.surface}>{furigana.surface.join()}</Text>
+      <Text style={styles.surface}>{furigana.surface.join('')}</Text>
       {/* {furigana.surface.map((token, i) => (
         <Text key={i} style={styles.surface}>
           {token}
