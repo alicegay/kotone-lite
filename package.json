@@ -5,10 +5,10 @@
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
-    "prebuild": "expo prebuild",
+    "pbuild": "expo prebuild --platform android",
     "build": "eas build --platform android --local",
-    "build:cloud": "eas build --platform android",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "ios": "expo run:ios"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
