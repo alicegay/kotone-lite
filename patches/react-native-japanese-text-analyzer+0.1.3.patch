@@ -1,7 +1,7 @@
-diff --git a/android/build.gradle b/android/build.gradle
-index 7ec958b9cf32bf6d5e3ce01ee9bd69359ce008b1..04b6dc70af18cf285dd044f0d3f12da07e70fb42 100644
---- a/android/build.gradle
-+++ b/android/build.gradle
+diff --git a/node_modules/react-native-japanese-text-analyzer/android/build.gradle b/node_modules/react-native-japanese-text-analyzer/android/build.gradle
+index 7ec958b..04b6dc7 100644
+--- a/node_modules/react-native-japanese-text-analyzer/android/build.gradle
++++ b/node_modules/react-native-japanese-text-analyzer/android/build.gradle
 @@ -19,10 +19,10 @@ def safeExtGet(prop, fallback) {
  }
  
