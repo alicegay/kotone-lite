@@ -19,6 +19,16 @@ const androidDisplayCutout = (expoConfig) =>
     config.modResults = AndroidConfig.Styles.setStylesItem({
       parent: { name: 'AppTheme' },
       item: {
+        _: 'true',
+        $: {
+          name: 'android:windowTranslucentNavigation',
+        },
+      },
+      xml: config.modResults,
+    })
+    config.modResults = AndroidConfig.Styles.setStylesItem({
+      parent: { name: 'AppTheme' },
+      item: {
         _: '@android:color/transparent',
         $: {
           name: 'android:statusBarColor',

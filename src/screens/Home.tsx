@@ -118,7 +118,7 @@ const Home = () => {
       <SafeAreaView
         style={{
           flex: 1,
-          paddingHorizontal: 64,
+          paddingHorizontal: 48,
           backgroundColor: color,
         }}
       >
