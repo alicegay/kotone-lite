@@ -79,23 +79,22 @@ const FuriText = ({ furigana }: Props) => {
       {!!ready &&
         !!widths &&
         !!totals &&
-        furigana.pronunciation.map(
-          (token, i) =>
-            token != furigana.surface[i] &&
-            !disallowed.includes(token) &&
-            totals[i] &&
-            widths[i] &&
-            fwidths[i] && (
-              <Text
-                key={i + 'f'}
-                style={[
-                  styles.pronunciation,
-                  { left: totals[i] + widths[i] / 2 - fwidths[i] / 2 },
-                ]}
-              >
-                {furigana.pronunciation[i]}
-              </Text>
-            )
+        furigana.pronunciation.map((token, i) =>
+          token != furigana.surface[i] &&
+          !disallowed.includes(token) &&
+          totals.length > i &&
+          widths.length > i &&
+          fwidths.length > i ? (
+            <Text
+              key={i + 'f'}
+              style={[
+                styles.pronunciation,
+                { left: totals[i] + widths[i] / 2 - fwidths[i] / 2 },
+              ]}
+            >
+              {furigana.pronunciation[i]}
+            </Text>
+          ) : null
         )}
     </View>
   )
