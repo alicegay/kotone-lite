@@ -122,7 +122,6 @@ const Home = () => {
       <View
         style={{
           flex: 1,
-          paddingHorizontal: 48,
           backgroundColor: color,
         }}
       >
@@ -132,7 +131,7 @@ const Home = () => {
             resizeMode='cover'
             style={{
               position: 'absolute',
-              width: width,
+              width: '100%',
               height: '100%',
             }}
           />
@@ -140,140 +139,150 @@ const Home = () => {
         <View
           style={{
             position: 'absolute',
-            width: width,
+            width: '100%',
             height: '100%',
             backgroundColor: '#0004',
           }}
         />
-        {!!track && (
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'column',
-              gap: 16,
-              justifyContent: 'center',
-            }}
-          >
+        <View style={{ flex: 1, paddingHorizontal: 48 }}>
+          {!!track && (
             <View
               style={{
-                flexDirection: 'row',
-                gap: 32,
+                flex: 1,
+                flexDirection: 'column',
+                gap: 16,
+                justifyContent: 'center',
               }}
             >
-              <Image
-                source={image}
-                contentFit='cover'
-                onError={() => {
-                  setImage(
-                    client.server +
-                      '/Items/' +
-                      track.AlbumId +
-                      '/Images/Primary'
-                  )
-                }}
-                style={{
-                  height: (height / 4) * 2.4,
-                  width: (height / 4) * 2.4,
-                  borderRadius: 24,
-                  overflow: 'hidden',
-                }}
-              />
               <View
                 style={{
-                  flex: 1,
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  gap: 4,
+                  flexDirection: 'row',
+                  gap: 32,
                 }}
               >
-                {!!furigana && <FuriText furigana={furigana} />}
-                {/* <Text
+                <Image
+                  source={image}
+                  contentFit='cover'
+                  onError={() => {
+                    setImage(
+                      client.server +
+                        '/Items/' +
+                        track.AlbumId +
+                        '/Images/Primary'
+                    )
+                  }}
+                  style={{
+                    height: (height / 4) * 2.4,
+                    width: (height / 4) * 2.4,
+                    borderRadius: 24,
+                    overflow: 'hidden',
+                  }}
+                />
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    gap: 4,
+                  }}
+                >
+                  {!!furigana && <FuriText furigana={furigana} />}
+                  {/* <Text
                   style={{ fontFamily: '700', fontSize: 48 }}
                   numberOfLines={2}
                 >
                   {track.Name}
                 </Text> */}
-                {!!track.Artists && (
-                  <Text style={{ fontFamily: '500', fontSize: 24 }}>
-                    {track.Artists.join(', ')}
-                  </Text>
-                )}
-                {!!track.Album && track.Name != track.Album && (
-                  <Text style={{ fontFamily: '400', fontSize: 20 }}>
-                    {track.Album}
-                  </Text>
-                )}
+                  {!!track.Artists && (
+                    <Text style={{ fontFamily: '500', fontSize: 24 }}>
+                      {track.Artists.join(', ')}
+                    </Text>
+                  )}
+                  {!!track.Album && track.Name != track.Album && (
+                    <Text style={{ fontFamily: '400', fontSize: 20 }}>
+                      {track.Album}
+                    </Text>
+                  )}
+                </View>
               </View>
-            </View>
 
-            <View
-              style={{
-                flexDirection: 'row',
-                gap: 16,
-                alignItems: 'center',
-              }}
-            >
-              <Text>{ticksToTime(session.data.PlayState.PositionTicks)}</Text>
-              <View
-                style={{
-                  backgroundColor: '#eee4',
-                  height: 4,
-                  flexGrow: 1,
-                  borderRadius: 2,
-                  overflow: 'hidden',
-                }}
-              >
-                <View
-                  style={{
-                    backgroundColor: '#eee',
-                    height: 4,
-                    width: ((session.data.PlayState.PositionTicks /
-                      track.RunTimeTicks) *
-                      100 +
-                      '%') as DimensionValue,
-                    borderRadius: 2,
-                    overflow: 'hidden',
-                  }}
-                />
-              </View>
-              <Text>{ticksToTime(track.RunTimeTicks)}</Text>
-            </View>
-
-            {session.data.SupportsRemoteControl && (
               <View
                 style={{
                   flexDirection: 'row',
-                  justifyContent: 'center',
-                  gap: 32,
+                  gap: 16,
+                  alignItems: 'center',
                 }}
               >
-                <IconButton
-                  icon='skip-previous'
-                  onPress={() => {
-                    sessions.playState(
-                      client.api,
-                      session.data.Id,
-                      'PreviousTrack'
-                    )
+                <Text>{ticksToTime(session.data.PlayState.PositionTicks)}</Text>
+                <View
+                  style={{
+                    backgroundColor: '#eee4',
+                    height: 4,
+                    flexGrow: 1,
+                    borderRadius: 2,
+                    overflow: 'hidden',
                   }}
-                />
-                <IconButton
-                  icon={session.data.PlayState.IsPaused ? 'play' : 'pause'}
-                  onPress={() => {
-                    sessions.playState(client.api, session.data.Id, 'PlayPause')
-                  }}
-                />
-                <IconButton
-                  icon='skip-next'
-                  onPress={() => {
-                    sessions.playState(client.api, session.data.Id, 'NextTrack')
-                  }}
-                />
-                {/* <IconButton icon='heart' /> */}
+                >
+                  <View
+                    style={{
+                      backgroundColor: '#eee',
+                      height: 4,
+                      width: ((session.data.PlayState.PositionTicks /
+                        track.RunTimeTicks) *
+                        100 +
+                        '%') as DimensionValue,
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                    }}
+                  />
+                </View>
+                <Text>{ticksToTime(track.RunTimeTicks)}</Text>
               </View>
-            )}
-          </View>
-        )}
+
+              {session.data.SupportsRemoteControl && (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    gap: 32,
+                  }}
+                >
+                  <IconButton
+                    icon='skip-previous'
+                    onPress={() => {
+                      sessions.playState(
+                        client.api,
+                        session.data.Id,
+                        'PreviousTrack'
+                      )
+                    }}
+                  />
+                  <IconButton
+                    icon={session.data.PlayState.IsPaused ? 'play' : 'pause'}
+                    onPress={() => {
+                      sessions.playState(
+                        client.api,
+                        session.data.Id,
+                        'PlayPause'
+                      )
+                    }}
+                  />
+                  <IconButton
+                    icon='skip-next'
+                    onPress={() => {
+                      sessions.playState(
+                        client.api,
+                        session.data.Id,
+                        'NextTrack'
+                      )
+                    }}
+                  />
+                  {/* <IconButton icon='heart' /> */}
+                </View>
+              )}
+            </View>
+          )}
+        </View>
       </View>
     </>
   )
