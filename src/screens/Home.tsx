@@ -113,6 +113,7 @@ const Home = () => {
   }, 3_000)
 
   useEffect(() => {
+    NavigationBar.setBehaviorAsync('inset-swipe')
     NavigationBar.setVisibilityAsync('hidden')
   }, [])
 
