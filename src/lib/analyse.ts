@@ -7,10 +7,11 @@ export const analyse = async (input: string): Promise<Furigana> => {
 
   const surface = tokens.map((token) => token.surface_form)
   const pronunciation = tokens.map((token, i) => {
-    const result = wanakana.toHiragana(token.pronunciation)
-    if (surface[i] == 'は' && result == 'わ') return '*'
-    if (wanakana.toHiragana(surface[i]) == result) return '*'
-    return result
+    const furi = wanakana.toHiragana(token.pronunciation)
+    if (surface[i] == 'は' && furi == 'わ') return '*'
+    if (surface[i] == 'へ' && furi == 'え') return '*'
+    if (wanakana.toHiragana(surface[i]) == furi) return '*'
+    return furi
   })
 
   const result = {

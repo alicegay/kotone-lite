@@ -3,9 +3,9 @@ import { DimensionValue, View, useWindowDimensions } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Image } from 'expo-image'
 import { StatusBar } from 'expo-status-bar'
+import * as NavigationBar from 'expo-navigation-bar'
 import { useKeepAwake } from 'expo-keep-awake'
 import { useQueryClient } from '@tanstack/react-query'
-import { getBlurHashAverageColor } from 'fast-blurhash'
 import tinycolor from 'tinycolor2'
 import Item from 'jellyfin-api/lib/types/media/Item'
 
@@ -19,6 +19,7 @@ import { sessions } from 'jellyfin-api'
 import { analyse } from 'lib/analyse'
 import Furigana from 'types/Furigana'
 import FuriText from 'components/FuriText'
+import { Blurhash } from 'react-native-blurhash'
 
 const Home = () => {
   useKeepAwake()
@@ -26,13 +27,14 @@ const Home = () => {
   const client = useClient()
   const query = useQueryClient()
   const session = useSessions()
-  const { height } = useWindowDimensions()
+  const { width, height } = useWindowDimensions()
 
   const [track, setTrack] = useState<Item>()
+  const [lastTrack, setLastTrack] = useState<string>()
   const [image, setImage] = useState<string>()
   const [color, setColor] = useState<string>('#222')
+  const [blurhash, setBlurhash] = useState<string>(null)
   const [furigana, setFurigana] = useState<Furigana>()
-  const [lastTrack, setLastTrack] = useState<string>()
 
   useEffect(() => {
     if (!!session.data && !!session.data.NowPlayingItem) {
@@ -46,25 +48,23 @@ const Home = () => {
         setLastTrack(track.Id)
         setImage(client.server + '/Items/' + track.Id + '/Images/Primary')
         if ('Primary' in track.ImageTags || track.AlbumPrimaryImageTag) {
-          const average = getBlurHashAverageColor(
+          const hash =
             track.ImageBlurHashes.Primary[
               'Primary' in track.ImageTags
                 ? track.ImageTags.Primary
                 : track.AlbumPrimaryImageTag
             ]
-          )
+          const average = Blurhash.getAverageColor(hash)
           const tcolor = tinycolor({
-            r: average[0],
-            g: average[1],
-            b: average[2],
+            r: average.r,
+            g: average.g,
+            b: average.g,
           })
-          if (tcolor.isLight()) {
-            setColor(tcolor.darken(30).toHex8String())
-          } else {
-            setColor(tcolor.toHex8String())
-          }
+          setColor(tcolor.toHex8String())
+          setBlurhash(hash)
         } else {
           setColor('#222')
+          setBlurhash(null)
         }
         analyse(track.Name).then((result) => setFurigana(result))
       }
@@ -112,16 +112,39 @@ const Home = () => {
     query.invalidateQueries({ queryKey: ['sessions'] })
   }, 3_000)
 
+  useEffect(() => {
+    NavigationBar.setVisibilityAsync('hidden')
+  }, [])
+
   return (
     <>
       <StatusBar style='light' />
-      <SafeAreaView
+      <View
         style={{
           flex: 1,
           paddingHorizontal: 48,
           backgroundColor: color,
         }}
       >
+        {!!blurhash && (
+          <Blurhash
+            blurhash={blurhash}
+            resizeMode='cover'
+            style={{
+              position: 'absolute',
+              width: width,
+              height: '100%',
+            }}
+          />
+        )}
+        <View
+          style={{
+            position: 'absolute',
+            width: width,
+            height: '100%',
+            backgroundColor: '#0004',
+          }}
+        />
         {!!track && (
           <View
             style={{
@@ -182,6 +205,7 @@ const Home = () => {
                 )}
               </View>
             </View>
+
             <View
               style={{
                 flexDirection: 'row',
@@ -214,40 +238,43 @@ const Home = () => {
               </View>
               <Text>{ticksToTime(track.RunTimeTicks)}</Text>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                gap: 32,
-              }}
-            >
-              <IconButton
-                icon='skip-previous'
-                onPress={() => {
-                  sessions.playState(
-                    client.api,
-                    session.data.Id,
-                    'PreviousTrack'
-                  )
+
+            {session.data.SupportsRemoteControl && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  gap: 32,
                 }}
-              />
-              <IconButton
-                icon={session.data.PlayState.IsPaused ? 'play' : 'pause'}
-                onPress={() => {
-                  sessions.playState(client.api, session.data.Id, 'PlayPause')
-                }}
-              />
-              <IconButton
-                icon='skip-next'
-                onPress={() => {
-                  sessions.playState(client.api, session.data.Id, 'NextTrack')
-                }}
-              />
-              {/* <IconButton icon='heart' /> */}
-            </View>
+              >
+                <IconButton
+                  icon='skip-previous'
+                  onPress={() => {
+                    sessions.playState(
+                      client.api,
+                      session.data.Id,
+                      'PreviousTrack'
+                    )
+                  }}
+                />
+                <IconButton
+                  icon={session.data.PlayState.IsPaused ? 'play' : 'pause'}
+                  onPress={() => {
+                    sessions.playState(client.api, session.data.Id, 'PlayPause')
+                  }}
+                />
+                <IconButton
+                  icon='skip-next'
+                  onPress={() => {
+                    sessions.playState(client.api, session.data.Id, 'NextTrack')
+                  }}
+                />
+                {/* <IconButton icon='heart' /> */}
+              </View>
+            )}
           </View>
         )}
-      </SafeAreaView>
+      </View>
     </>
   )
 }

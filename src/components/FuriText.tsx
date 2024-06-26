@@ -34,12 +34,18 @@ const FuriText = ({ furigana }: Props) => {
   const [fwidths, setFWidths] = useState<number[]>([])
 
   useEffect(() => {
-    measure()
+    measure().then(() => {
+      setReady(true)
+      setWidths(_widths)
+      setTotals(_totals)
+      setFWidths(_fwidths)
+    })
   }, [furigana])
 
   const measure = async () => {
     setWidths([])
     setTotals([])
+    setFWidths([])
     setReady(false)
     for (let i = 0; i < furigana.surface.length; i++) {
       const size = await textSize.measure({
@@ -60,10 +66,6 @@ const FuriText = ({ furigana }: Props) => {
       })
       _fwidths = [..._fwidths, size.width]
     }
-    setReady(true)
-    setWidths(_widths)
-    setTotals(_totals)
-    setFWidths(_fwidths)
   }
 
   return (
@@ -80,7 +82,10 @@ const FuriText = ({ furigana }: Props) => {
         furigana.pronunciation.map(
           (token, i) =>
             token != furigana.surface[i] &&
-            !disallowed.includes(token) && (
+            !disallowed.includes(token) &&
+            totals[i] &&
+            widths[i] &&
+            fwidths[i] && (
               <Text
                 key={i + 'f'}
                 style={[
