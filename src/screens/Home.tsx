@@ -122,6 +122,10 @@ const Home = () => {
     }
   }, [lyric])
 
+  useInterval(() => {
+    if (!!position) setPosition(position + 100_0000)
+  }, 100)
+
   // const socket = new WebSocket(
   //   client.server.replace('https://', 'wss://').replace('http://', 'wss://') +
   //     '/socket?api_key=' +
