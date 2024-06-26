@@ -121,9 +121,11 @@ const SelectServer = ({
     view: {
       flex: 1,
       marginHorizontal: 192,
-      marginTop: 0,
+      //marginTop: 0,
+      justifyContent: 'center',
+      gap: 8,
     },
-    input: { marginBottom: 8 },
+    input: { fontSize: 16 },
     options: { flexDirection: 'row-reverse', gap: 16 },
   })
 
