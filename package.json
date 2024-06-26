@@ -27,7 +27,7 @@
     "expo-navigation-bar": "~3.0.6",
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.6",
-    "jellyfin-api": "github:alicegay/jellyfin-api#a55b65d",
+    "jellyfin-api": "github:alicegay/jellyfin-api",
     "react": "18.2.0",
     "react-native": "0.74.2",
     "react-native-blurhash": "1.1.11",

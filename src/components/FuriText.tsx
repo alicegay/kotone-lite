@@ -6,21 +6,31 @@ import textSize from 'react-native-text-size'
 
 interface Props {
   furigana: Furigana
+  surfaceSize: number
+  pronunciationSize: number
+  surfaceFont: string
+  pronunciationFont: string
 }
 
-const FuriText = ({ furigana }: Props) => {
+const FuriText = ({
+  furigana,
+  surfaceSize,
+  pronunciationSize,
+  surfaceFont,
+  pronunciationFont,
+}: Props) => {
   const disallowed = ['*', '「', '」']
 
   const styles = StyleSheet.create({
     surface: {
-      fontSize: 40,
-      fontFamily: '700',
+      fontSize: surfaceSize,
+      fontFamily: surfaceFont,
     },
     pronunciation: {
-      fontSize: 16,
-      fontFamily: '500',
+      fontSize: pronunciationSize,
+      fontFamily: pronunciationFont,
       position: 'absolute',
-      top: -16,
+      top: -pronunciationSize,
     },
   })
 
@@ -50,8 +60,8 @@ const FuriText = ({ furigana }: Props) => {
     for (let i = 0; i < furigana.surface.length; i++) {
       const size = await textSize.measure({
         text: furigana.surface[i],
-        fontFamily: '700',
-        fontSize: 40,
+        fontFamily: surfaceFont,
+        fontSize: surfaceSize,
         usePreciseWidth: true,
       })
       _widths = [..._widths, size.width]
@@ -60,8 +70,8 @@ const FuriText = ({ furigana }: Props) => {
     for (let i = 0; i < furigana.pronunciation.length; i++) {
       const size = await textSize.measure({
         text: furigana.pronunciation[i],
-        fontFamily: '500',
-        fontSize: 16,
+        fontFamily: pronunciationFont,
+        fontSize: pronunciationSize,
         usePreciseWidth: true,
       })
       _fwidths = [..._fwidths, size.width]

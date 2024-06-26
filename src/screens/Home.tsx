@@ -15,37 +15,52 @@ import useSessions from 'api/useSessions'
 import ticksToTime from 'lib/ticksToTime'
 import Text from 'components/Text'
 import IconButton from 'components/IconButton'
-import { sessions } from 'jellyfin-api'
+import { audio, sessions } from 'jellyfin-api'
 import { analyse } from 'lib/analyse'
 import Furigana from 'types/Furigana'
 import FuriText from 'components/FuriText'
 import { Blurhash } from 'react-native-blurhash'
+import Lyrics from 'jellyfin-api/lib/types/media/Lyrics'
 
 const Home = () => {
   useKeepAwake()
 
+  useEffect(() => {
+    NavigationBar.setBehaviorAsync('inset-swipe')
+    NavigationBar.setVisibilityAsync('hidden')
+  }, [])
+
   const client = useClient()
   const query = useQueryClient()
   const session = useSessions()
-  const { width, height } = useWindowDimensions()
+  const { height } = useWindowDimensions()
 
   const [track, setTrack] = useState<Item>()
   const [lastTrack, setLastTrack] = useState<string>()
+  const [position, setPosition] = useState<number>(0)
   const [image, setImage] = useState<string>()
   const [color, setColor] = useState<string>('#222')
   const [blurhash, setBlurhash] = useState<string>(null)
   const [furigana, setFurigana] = useState<Furigana>()
+  const [lyrics, setLyrics] = useState<Lyrics>(null)
+  const [lyric, setLyric] = useState<string>(null)
+  const [lyricFuri, setLyricFuri] = useState<Furigana>(null)
 
   useEffect(() => {
     if (!!session.data && !!session.data.NowPlayingItem) {
       setTrack(session.data.NowPlayingItem)
+      if (!!session.data.PlayState.PositionTicks) {
+        setPosition(session.data.PlayState.PositionTicks)
+      }
     }
   }, [session.data])
 
   useEffect(() => {
     if (!!track) {
       if (lastTrack != track.Id) {
+        setPosition(0)
         setLastTrack(track.Id)
+        setLyric(null)
         setImage(client.server + '/Items/' + track.Id + '/Images/Primary')
         if ('Primary' in track.ImageTags || track.AlbumPrimaryImageTag) {
           const hash =
@@ -67,6 +82,10 @@ const Home = () => {
           setBlurhash(null)
         }
         analyse(track.Name).then((result) => setFurigana(result))
+        audio.lyrics(client.api, track.Id).then(
+          (res) => setLyrics(res),
+          () => setLyrics(null)
+        )
       }
     }
   }, [track])
@@ -77,6 +96,31 @@ const Home = () => {
       console.log('PRONUNCIATION  ' + furigana.pronunciation.join(' '))
     }
   }, [furigana])
+
+  useEffect(() => {
+    if (!!lyrics && lyrics.Lyrics.length > 0) {
+      for (let i = 0; i < lyrics.Lyrics.length; i++) {
+        const start = lyrics.Lyrics[i].Start
+        if (start >= position) {
+          if (i == 0) {
+            setLyric(null)
+            break
+          }
+          if (lyrics.Lyrics[i - 1].Text == lyric) break
+          setLyric(lyrics.Lyrics[i - 1].Text)
+          break
+        }
+      }
+    }
+  }, [position])
+
+  useEffect(() => {
+    if (!!lyric) {
+      analyse(lyric).then((result) => setLyricFuri(result))
+    } else {
+      setLyricFuri(null)
+    }
+  }, [lyric])
 
   // const socket = new WebSocket(
   //   client.server.replace('https://', 'wss://').replace('http://', 'wss://') +
@@ -111,11 +155,6 @@ const Home = () => {
   useInterval(() => {
     query.invalidateQueries({ queryKey: ['sessions'] })
   }, 3_000)
-
-  useEffect(() => {
-    NavigationBar.setBehaviorAsync('inset-swipe')
-    NavigationBar.setVisibilityAsync('hidden')
-  }, [])
 
   return (
     <>
@@ -187,7 +226,15 @@ const Home = () => {
                     gap: 4,
                   }}
                 >
-                  {!!furigana && <FuriText furigana={furigana} />}
+                  {!!furigana && (
+                    <FuriText
+                      furigana={furigana}
+                      surfaceSize={40}
+                      pronunciationSize={16}
+                      surfaceFont='700'
+                      pronunciationFont='500'
+                    />
+                  )}
                   {/* <Text
                   style={{ fontFamily: '700', fontSize: 48 }}
                   numberOfLines={2}
@@ -214,29 +261,39 @@ const Home = () => {
                   alignItems: 'center',
                 }}
               >
-                <Text>{ticksToTime(session.data.PlayState.PositionTicks)}</Text>
-                <View
-                  style={{
-                    backgroundColor: '#eee4',
-                    height: 4,
-                    flexGrow: 1,
-                    borderRadius: 2,
-                    overflow: 'hidden',
-                  }}
-                >
+                <Text>{ticksToTime(position)}</Text>
+                {!!lyric && !!lyricFuri ? (
+                  <View style={{ flexGrow: 1, alignItems: 'center' }}>
+                    <FuriText
+                      furigana={lyricFuri}
+                      surfaceSize={14}
+                      pronunciationSize={8}
+                      surfaceFont='400'
+                      pronunciationFont='400'
+                    />
+                  </View>
+                ) : (
                   <View
                     style={{
-                      backgroundColor: '#eee',
+                      backgroundColor: '#eee4',
                       height: 4,
-                      width: ((session.data.PlayState.PositionTicks /
-                        track.RunTimeTicks) *
-                        100 +
-                        '%') as DimensionValue,
+                      flexGrow: 1,
                       borderRadius: 2,
                       overflow: 'hidden',
                     }}
-                  />
-                </View>
+                  >
+                    <View
+                      style={{
+                        backgroundColor: '#eee',
+                        height: 4,
+                        width: ((position / track.RunTimeTicks) * 100 +
+                          '%') as DimensionValue,
+                        borderRadius: 2,
+                        overflow: 'hidden',
+                      }}
+                    />
+                  </View>
+                )}
                 <Text>{ticksToTime(track.RunTimeTicks)}</Text>
               </View>
 
