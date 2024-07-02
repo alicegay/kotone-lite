@@ -101,7 +101,7 @@ const Home = () => {
     if (!!lyrics && lyrics.Lyrics.length > 0) {
       for (let i = 0; i < lyrics.Lyrics.length; i++) {
         const start = lyrics.Lyrics[i].Start
-        if (start >= position) {
+        if (start >= position + 500_0000) {
           if (i == 0) {
             setLyric(null)
             break
@@ -123,7 +123,12 @@ const Home = () => {
   }, [lyric])
 
   useInterval(() => {
-    if (!!position) setPosition(position + 100_0000)
+    if (
+      !!position &&
+      !session.data.PlayState.IsPaused &&
+      position < track.RunTimeTicks
+    )
+      setPosition(position + 100_0000)
   }, 100)
 
   // const socket = new WebSocket(
@@ -158,6 +163,7 @@ const Home = () => {
 
   useInterval(() => {
     query.invalidateQueries({ queryKey: ['sessions'] })
+    NavigationBar.setVisibilityAsync('hidden')
   }, 3_000)
 
   return (
