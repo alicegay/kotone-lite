@@ -10,6 +10,7 @@ interface Props {
   pronunciationSize: number
   surfaceFont: string
   pronunciationFont: string
+  numberOfLines?: number
 }
 
 const FuriText = ({
@@ -18,45 +19,58 @@ const FuriText = ({
   pronunciationSize,
   surfaceFont,
   pronunciationFont,
+  numberOfLines = 1,
 }: Props) => {
-  const disallowed = ['*', '「', '」']
-
   const styles = StyleSheet.create({
     surface: {
       fontSize: surfaceSize,
       fontFamily: surfaceFont,
+      //paddingVertical: pronunciationSize / 4,
     },
     pronunciation: {
       fontSize: pronunciationSize,
       fontFamily: pronunciationFont,
       position: 'absolute',
-      top: -pronunciationSize,
     },
   })
 
   const [ready, setReady] = useState<boolean>(false)
+  const [limit, setLimit] = useState<number>(null)
+
+  let _splits = [0]
   let _widths = []
   let _totals = [0]
   let _fwidths = []
 
+  const [splits, setSplits] = useState<number[]>([])
   const [widths, setWidths] = useState<number[]>([])
   const [totals, setTotals] = useState<number[]>([])
   const [fwidths, setFWidths] = useState<number[]>([])
+  const [height, setHeight] = useState<number>(0)
 
   useEffect(() => {
-    measure().then(() => {
-      setReady(true)
-      setWidths(_widths)
-      setTotals(_totals)
-      setFWidths(_fwidths)
-    })
-  }, [furigana])
+    if (!!limit) {
+      measure().then(() => {
+        setReady(true)
+        setSplits(_splits)
+        setWidths(_widths)
+        setTotals(_totals)
+        setFWidths(_fwidths)
+      })
+    }
+  }, [furigana, limit])
 
   const measure = async () => {
+    setReady(false)
+    setSplits([])
     setWidths([])
     setTotals([])
     setFWidths([])
-    setReady(false)
+    setHeight(0)
+    _splits = [0]
+    _widths = []
+    _totals = [0]
+    _fwidths = []
     for (let i = 0; i < furigana.surface.length; i++) {
       const size = await textSize.measure({
         text: furigana.surface[i],
@@ -64,8 +78,14 @@ const FuriText = ({
         fontSize: surfaceSize,
         usePreciseWidth: true,
       })
+      if (height != size.height) setHeight(size.height)
       _widths = [..._widths, size.width]
-      _totals = [..._totals, _totals[_totals.length - 1] + size.width]
+      if (_totals[_totals.length - 1] + size.width > limit) {
+        _splits = [..._splits, i]
+        _totals = [..._totals.slice(0, -1), 0, size.width]
+      } else {
+        _totals = [..._totals, _totals[_totals.length - 1] + size.width]
+      }
     }
     for (let i = 0; i < furigana.pronunciation.length; i++) {
       const size = await textSize.measure({
@@ -79,33 +99,57 @@ const FuriText = ({
   }
 
   return (
-    <View style={{ flexDirection: 'row' }}>
-      {/* <Text style={styles.surface}>{furigana.surface.join('')}</Text> */}
-      {furigana.surface.map((token, i) => (
-        <Text key={i} style={styles.surface}>
-          {token}
-        </Text>
-      ))}
+    <View
+      style={{ flexDirection: 'column' }}
+      onLayout={(e) => {
+        setLimit(e.nativeEvent.layout.width)
+      }}
+    >
       {!!ready &&
+        !!limit &&
+        !!splits &&
         !!widths &&
         !!totals &&
-        furigana.pronunciation.map((token, i) =>
-          token != furigana.surface[i] &&
-          !disallowed.includes(token) &&
-          totals.length > i &&
-          widths.length > i &&
-          fwidths.length > i ? (
-            <Text
-              key={i + 'f'}
-              style={[
-                styles.pronunciation,
-                { left: totals[i] + widths[i] / 2 - fwidths[i] / 2 },
-              ]}
-            >
-              {furigana.pronunciation[i]}
-            </Text>
-          ) : null
-        )}
+        splits.map((split, y) => {
+          if (y >= numberOfLines) return null
+          const pronun =
+            splits.length > 1
+              ? y == splits.length - 1
+                ? furigana.pronunciation.slice(split)
+                : furigana.pronunciation.slice(split, splits[y + 1])
+              : furigana.pronunciation
+          return (
+            <View key={y + 's'}>
+              <Text style={styles.surface}>
+                {splits.length > 1
+                  ? y == splits.length - 1
+                    ? furigana.surface.slice(split).join('')
+                    : furigana.surface.slice(split, splits[y + 1]).join('')
+                  : furigana.surface.join('')}
+              </Text>
+              {pronun.map((token, i) => {
+                const ii = i + split
+                return token != '*' &&
+                  totals.length > ii &&
+                  widths.length > ii &&
+                  fwidths.length > ii ? (
+                  <Text
+                    key={ii + 'f'}
+                    style={[
+                      styles.pronunciation,
+                      {
+                        left: totals[ii] + widths[ii] / 2 - fwidths[ii] / 2,
+                        top: (-pronunciationSize / 3) * 2,
+                      },
+                    ]}
+                  >
+                    {furigana.pronunciation[ii]}
+                  </Text>
+                ) : null
+              })}
+            </View>
+          )
+        })}
     </View>
   )
 }

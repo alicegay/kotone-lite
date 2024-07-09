@@ -243,6 +243,7 @@ const Home = () => {
                       pronunciationSize={16}
                       surfaceFont='700'
                       pronunciationFont='500'
+                      numberOfLines={2}
                     />
                   )}
                   {/* <Text
@@ -271,12 +272,14 @@ const Home = () => {
                   alignItems: 'center',
                 }}
               >
-                <Text>{ticksToTime(position)}</Text>
+                <Text style={{ paddingVertical: 0, fontSize: 16 }}>
+                  {ticksToTime(position)}
+                </Text>
                 {!!lyric && !!lyricFuri ? (
                   <View style={{ flexGrow: 1, alignItems: 'center' }}>
                     <FuriText
                       furigana={lyricFuri}
-                      surfaceSize={14}
+                      surfaceSize={16}
                       pronunciationSize={8}
                       surfaceFont='400'
                       pronunciationFont='400'
@@ -304,7 +307,9 @@ const Home = () => {
                     />
                   </View>
                 )}
-                <Text>{ticksToTime(track.RunTimeTicks)}</Text>
+                <Text style={{ paddingVertical: 0, fontSize: 16 }}>
+                  {ticksToTime(track.RunTimeTicks)}
+                </Text>
               </View>
 
               {session.data.SupportsRemoteControl && (
