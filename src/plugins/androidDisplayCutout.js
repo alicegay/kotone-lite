@@ -1,7 +1,5 @@
 /** @type {import('@expo/config-plugins')} */
 const { withAndroidStyles, AndroidConfig } = require('@expo/config-plugins')
-const generateCode = require('@expo/config-plugins/build/utils/generateCode')
-const codeMod = require('@expo/config-plugins/build/android/codeMod')
 
 /** @type {import('@expo/config-plugins').ConfigPlugin} */
 const androidDisplayCutout = (expoConfig) =>

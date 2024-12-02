@@ -40,7 +40,8 @@
           ]
         }
       ],
-      "./src/plugins/androidDisplayCutout.js"
+      "./src/plugins/androidDisplayCutout.js",
+      "./src/plugins/cleartextTraffic.js"
     ],
     "extra": {
       "eas": {
